@@ -6,13 +6,13 @@
 | -------- | --------------------- |
 | TeamID   | Team-078              |
 | TeamName | Lucky                 |
-| Captain  | yc43       |
+| Captain  | Yueyang Chen       |
 | Captain  | yc43@illinois.edu  |
-| Member1  | runzhim2                   |
+| Member1  | Runzhi Ma                   |
 | Member1  | runzhim2@illinois.edu    |
-| Member2  | zhaoqix2              |
+| Member2  | Zhaoqi Xia              |
 | Member2  | zhaoqix2@illinois.edu |
-| Member3  | shuaih4               |
+| Member3  | Shuai Huang               |
 | Member3  | shuaih4@illinois.edu  |
 
 
