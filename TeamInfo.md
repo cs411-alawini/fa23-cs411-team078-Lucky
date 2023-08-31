@@ -6,16 +6,15 @@
 | -------- | --------------------- |
 | TeamID   | Team-078              |
 | TeamName | Lucky                 |
-| Captain  | Abdu Alawini          |
-| Captain  | alawini@illinois.edu  |
-| Member1  | yc43                  |
-| Member1  | yc432@illinois.edu    |
+| Captain  | yc43       |
+| Captain  | yc432@illinois.edu  |
+| Member1  | runzhim2                   |
+| Member1  | runzhim2@illinois.edu    |
 | Member2  | zhaoqix2              |
 | Member2  | zhaoqix2@illinois.edu |
 | Member3  | shuaih4               |
 | Member3  | shuaih4@illinois.edu  |
-| Member4  | runzhim2              |
-| Member4  | runzhim2@illinois.edu |
+
 
 ## Project Information
 
