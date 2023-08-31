@@ -7,7 +7,7 @@
 | TeamID   | Team-078              |
 | TeamName | Lucky                 |
 | Captain  | yc43       |
-| Captain  | yc432@illinois.edu  |
+| Captain  | yc43@illinois.edu  |
 | Member1  | runzhim2                   |
 | Member1  | runzhim2@illinois.edu    |
 | Member2  | zhaoqix2              |
