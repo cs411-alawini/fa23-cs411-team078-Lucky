@@ -20,10 +20,11 @@
 
 | Info       | Description    |
 | ---------- | -------------- |
-| Title      | ProjectTitle   |
+| Title      | SafeDine LA   |
 | System URL | link_to_system |
 | Video Link | link_to_video  |
 
 ## Project Summary
 
-This is a summary of the project!
+Our project aims to develop an application that leverages the “Crime in Los Angeles from 2020 to Present” dataset, along with restaurant data in Los Angeles, to provide users with restaurant recommendations based on their personal preferences sorted by safety ratings. The primary problem we intend to address is helping residents and visitors make informed dining choices by factoring in the safety of the restaurant's location.
+
