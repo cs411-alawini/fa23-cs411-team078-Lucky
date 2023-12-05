@@ -1,8 +1,8 @@
 // LoginPage.js
 import React from 'react';
-import './LoginPage.css'; // Make sure to create a corresponding CSS file
+import './SignUp.css'; // Make sure to create a corresponding CSS file
 
-function LoginPage() {
+function SignUp() {
   const handleLogin = (event) => {
     event.preventDefault();
     // Logic for handling login
@@ -33,4 +33,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default SignUp;
