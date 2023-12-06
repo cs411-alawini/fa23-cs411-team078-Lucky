@@ -64,6 +64,12 @@ function RestaurantListPage() {
             className={currentTag === "recommend" ? "active" : ""}
             onClick={() => setCurrentTag("recommend")}
           >
+            All Restaurants
+          </button>
+          <button
+            className={currentTag === "favorite" ? "active" : ""}
+            onClick={() => navigate('/recommend')}
+          >
             Recommend
           </button>
           <button

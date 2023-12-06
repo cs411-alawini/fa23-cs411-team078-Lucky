@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Favorite from "./pages/Favorite";
 import { UserProvider } from './pages/UserContext';
 import History from "./pages/History";
+import Recommend from "./pages/Recommend";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/restaurants/:id" element={<RestaurantDetailPage />} />
           <Route path="/favorite" element={<Favorite />} />
           <Route path="/history" element={<History />} />
+          <Route path="/recommend" element={<Recommend />} />
         </Routes>
       </BrowserRouter>
     </UserProvider>
