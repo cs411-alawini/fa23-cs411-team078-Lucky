@@ -6,38 +6,6 @@ import RestaurantItem from "../Components/RestaurantItem";
 import axios from "axios";
 
 function RestaurantListPage() {
-  // 这里做对接
-  const dummyRestaurants = [
-    {
-      id: 1,
-      name: "The Gourmet Hut",
-      rating: "4.5",
-      style: "Italian",
-      price: "$$$",
-      address: "123 Foodie Lane, Taste Town",
-      comments: ["The", "Gourmet", "Hut"],
-    },
-    {
-      id: 2,
-      name: "Burger Bonanza",
-      rating: "4.2",
-      style: "Fast Food",
-      price: "$",
-      address: "456 Snack Street, Munch City",
-      comments: ["Burger", "Bonanza"],
-    },
-    {
-      id: 3,
-      name: "Sushi Central",
-      rating: "4.8",
-      style: "Japanese",
-      price: "$$$",
-      address: "789 Sashimi Blvd, Oceanview",
-      comments: ["Sushi", "Central"],
-    },
-    // ... more restaurants
-  ];
-
   const [recommends, setRecommends] = useState([]); // This should be your actual restaurant data
   const [searchTerm, setSearchTerm] = useState("");
   const [currentTag, setCurrentTag] = useState("recommend");
@@ -81,7 +49,7 @@ function RestaurantListPage() {
       ? filterRestaurants(histories)
       : currentTag === "favorite"
       ? filterRestaurants(favorites)
-      : dummyRestaurants;
+      : recommends;
   // Rendered list based on search term
 
   return (
