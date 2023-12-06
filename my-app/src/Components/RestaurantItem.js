@@ -7,13 +7,13 @@ function RestaurantItem({ restaurant, onClick: setHistories }) {
     <div
       className="restaurant-item"
       onClick={() =>
-        navigate(`/restaurants/${restaurant.id}`, { state: restaurant })
+        navigate(`/restaurants/${restaurant.restaurantName}`, { state: restaurant })
       }
     >
       <div className="restaurant-details">
-        <span className="restaurant-name">{restaurant.name}</span>
+        <span className="restaurant-name">{restaurant.restaurantName}</span>
         <div className="restaurant-meta">
-          <span className="restaurant-rating">Rating: {restaurant.rating}</span>
+          {/* <span className="restaurant-rating">Rating: {restaurant.rating}</span> */}
           <span className="restaurant-style">Style: {restaurant.style}</span>
           <span className="restaurant-price">Price: {restaurant.price}</span>
         </div>
