@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 import "./RestaurantDetailPage.css";
 
@@ -21,6 +22,23 @@ function RestaurantDetailPage() {
     console.log(`isFacorite: ${isFavorite}`);
   }
 
+  const [ratings, setRatings] = useState([]);
+  const encodedRestaurantName = encodeURIComponent(restaurant.restaurantName);
+  useEffect(() => {
+    // Fetch restaurants from the Django backend
+    const fetchRatings = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/api/ratings/${encodedRestaurantName}/`);
+        setRatings(response.data[0].score);
+        console.log(response.data[0].score);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      }
+    };
+
+    fetchRatings();
+  }, [encodedRestaurantName]);
+
   return (
     <div className="restaurantDetailPage">
       <div className="container">
@@ -34,10 +52,10 @@ function RestaurantDetailPage() {
           </button>
         </div>
         <div className="restaurantDetails">
-          {/* <div>
+          <div>
             <label>Rating:</label>
-            <span>{restaurant.rating}</span>
-          </div> */}
+            <span>{ratings}</span>
+          </div>
           <div>
             <label>Style:</label>
             <span>{restaurant.style}</span>

@@ -1,4 +1,6 @@
 import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 function RestaurantItem({ restaurant, onClick: setHistories }) {
   const navigate = useNavigate();
@@ -13,7 +15,7 @@ function RestaurantItem({ restaurant, onClick: setHistories }) {
       <div className="restaurant-details">
         <span className="restaurant-name">{restaurant.restaurantName}</span>
         <div className="restaurant-meta">
-          {/* <span className="restaurant-rating">Rating: {restaurant.rating}</span> */}
+          {/* <span className="restaurant-rating">Rating: {ratings.length > 0 ? ratings[0].score : 'Loading...'}</span> */}
           <span className="restaurant-style">Style: {restaurant.style}</span>
           <span className="restaurant-price">Price: {restaurant.price}</span>
         </div>
