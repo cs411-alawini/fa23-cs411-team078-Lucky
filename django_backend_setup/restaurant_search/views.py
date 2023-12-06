@@ -1,9 +1,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db import connection
-from .models import Restaurant, Rating
+from .models import Restaurant, Rating, Users, History, Favorites
 from .forms import RestaurantFilterForm
 from rest_framework import viewsets
-from .serializers import RestaurantSerializer
+from .serializers import RestaurantSerializer, RatingSerializer
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 def restaurant_list(request):
     # form = RestaurantFilterForm(request.GET)
@@ -43,8 +47,27 @@ def restaurant_ratings(request, restaurant_name):
         'ratings': ratings
     })
 
+def show_data(request):
+    users = Users.objects.all()  # Retrieves all users
+    history = History.objects.all()  # Retrieves all history records
+    favorites = Favorites.objects.all()  # Retrieves all favorites records
+
+    context = {
+        'users': users,
+        'history': history,
+        'favorites': favorites,
+    }
+    
+    return render(request, 'shows.html', context)
 
 class RestaurantViewSet(viewsets.ModelViewSet):
     queryset = Restaurant.objects.raw('SELECT * FROM Restaurants')
     serializer_class = RestaurantSerializer
+
+class RatingList(APIView):
+    def get(self, request, restaurant_name):
+        ratings = Rating.objects.filter(restaurantName=restaurant_name)
+        serializer = RatingSerializer(ratings, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     

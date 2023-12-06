@@ -16,5 +16,27 @@ class Rating(models.Model):
     comment = models.TextField()
     class Meta:
         db_table = 'Rating'
+
+class Users(models.Model):
+    userID = models.AutoField(primary_key=True)
+    userName = models.CharField(max_length=255, null=False)
+    password = models.CharField(max_length=255, null=False)
+    class Meta:
+        db_table = 'Users'
+
+class History(models.Model):
+    favoriteID = models.AutoField(primary_key=True)
+    userID = models.ForeignKey(Users, on_delete=models.CASCADE, db_column='userID')
+    input = models.CharField(max_length=255, null=False)
+    class Meta:
+        db_table = 'History'
+
+class Favorites(models.Model):
+    favoriteID = models.AutoField(primary_key=True)
+    userID = models.ForeignKey(Users, on_delete=models.CASCADE, db_column='userID')
+    restaurantName = models.CharField(max_length=255, null=False)
+    note = models.CharField(max_length=255, null=False)
+    class Meta:
+        db_table = 'Favorites'
     
 
