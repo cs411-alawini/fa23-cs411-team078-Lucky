@@ -25,7 +25,7 @@ function RestaurantDetailPage() {
     <div className="restaurantDetailPage">
       <div className="container">
         <div className="pageTitle">
-          <h1>{restaurant.name}</h1>
+          <h1>{restaurant.restaurantName}</h1>
           <button
             className={`favoriteButton${isFavorite ? " isFavorite" : ""}`}
             onClick={toggleFavorite}
@@ -34,10 +34,10 @@ function RestaurantDetailPage() {
           </button>
         </div>
         <div className="restaurantDetails">
-          <div>
+          {/* <div>
             <label>Rating:</label>
             <span>{restaurant.rating}</span>
-          </div>
+          </div> */}
           <div>
             <label>Style:</label>
             <span>{restaurant.style}</span>
@@ -52,11 +52,11 @@ function RestaurantDetailPage() {
             <span>{restaurant.address}</span>
           </div>
         </div>
-        <div className="restaurantComments">
+        {/* <div className="restaurantComments">
           {restaurant.comments.map((comment) => {
             return <p key={comment}>{comment}</p>;
           })}
-        </div>
+        </div> */}
         <button className="backButton" onClick={handleBack}>
           Back
         </button>

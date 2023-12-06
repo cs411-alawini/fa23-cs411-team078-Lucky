@@ -54,7 +54,6 @@ function RestaurantListPage() {
 
   return (
     <div className="restaurant-list-page">
-      <h1>Welcome, Dawn</h1>
       {/* Tabs and Search Bar */}
       <div className="top-bar">
         <div className="tabs">
