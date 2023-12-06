@@ -25,7 +25,7 @@ class Users(models.Model):
         db_table = 'Users'
 
 class History(models.Model):
-    favoriteID = models.AutoField(primary_key=True)
+    historyID = models.AutoField(primary_key=True)
     userID = models.ForeignKey(Users, on_delete=models.CASCADE, db_column='userID')
     input = models.CharField(max_length=255, null=False)
     class Meta:

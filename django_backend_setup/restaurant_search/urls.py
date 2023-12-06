@@ -17,5 +17,5 @@ urlpatterns = [
     path('api/ratings/<str:restaurant_name>/', RatingList.as_view(), name='rating-list'),
     path('api/user/favorites/<str:user_name>/', UserFavoritesView.as_view(), name='user-favorites'),
     path('api/user/history/<str:user_name>/', UserHistoryView.as_view(), name='user-history'),
-
+    path('api/update/<str:user_name>/', views.update_favorite, name='update-favorite'),
 ]

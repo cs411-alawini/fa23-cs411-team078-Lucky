@@ -13,6 +13,10 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
+from django.http import JsonResponse
+# from django.views.decorators.csrf import csrf_exempt
+import json
+
 def restaurant_list(request):
     # form = RestaurantFilterForm(request.GET)
     
@@ -78,17 +82,40 @@ class RatingList(APIView):
 
 class UserFavoritesView(APIView):
     def get(self, request, user_name):
-        # user = Users.objects.raw('SELECT userID FROM Users WHERE userName = %s', [user_name])
+        # user = Users.objects.raw('SELECT userID FROM Users WHERE userID = %d',  [user_name])
         user = Users.objects.filter(userName=user_name)[0]
-        # favorites = Favorites.objects.raw('SELECT * FROM Favorites WHERE userID = %s', [user])
+        # favorites = Favorites.objects.raw('SELECT * FROM Favorites WHERE userID = %d', [user_name])
         favorites = Favorites.objects.filter(userID = user)
         serializer = FavoritesSerializer(favorites, many=True)
         return Response(serializer.data)
+    # def post(self, request, user_name):
+    #     # Get the user object using ORM to ensure it exists
+    #     user = get_object_or_404(Users, userName=user_name)
+    #     data = request.data
+    #     restaurant_name = data['restaurantName']
+    #     is_favorite = data['isFavorite']
+
+    #     # Use raw SQL to update the favorite
+    #     with connection.cursor() as cursor:
+    #         if is_favorite:
+    #             # Here you would insert the favorite, ensuring you use parameterized queries
+    #             cursor.execute("SELECT COUNT(*) FROM Favorites")
+    #             newfavID = cursor.fetchone()[0]
+    #             cursor.execute("INSERT INTO Favorites (favoriteID, userID, restaurantName, note) VALUES (%s, %s, %s, %s)", [newfavID, user, restaurant_name, 'haha'])
+    #             status_code = status.HTTP_201_CREATED
+    #         else:
+    #             cursor.execute("DELETE FROM Favorites WHERE userID = %s AND restaurantName = %s", [user, restaurant_name])
+
+    #             status_code = status.HTTP_204_NO_CONTENT
+
+    #     return Response({'status': 'success'}, status=status_code)
 
 class UserHistoryView(APIView):
     def get(self, request, user_name):
-        user = Users.objects.raw('SELECT userID FROM Users WHERE userName = user_name')
-        history = History.objects.raw('SELECT * FROM History WHERE userID = %d', [user])
+        # user_query = Users.objects.raw('SELECT userID FROM Users WHERE userName = user_name')
+        user = Users.objects.filter(userName=user_name)[0]
+        # history = History.objects.raw('SELECT * FROM History WHERE userID = %d', [user])
+        history = History.objects.filter(userID = user)
         serializer = HistorySerializer(history, many=True)
         return Response(serializer.data)
 
@@ -104,4 +131,69 @@ class UserHistoryView(APIView):
 #         cursor.execute("DELETE FROM favorite WHERE user_id = %s AND restaurant_id = %s", [user_id, restaurantName])
 #     return JsonResponse({'status': 'success'})
 
-    
+@csrf_exempt
+def update_favorite(request, user_name):
+    if request.method == 'POST':
+        user = Users.objects.filter(userName=user_name)[0]
+        data = json.loads(request.body)
+        restaurant_name = data['restaurantName']
+        
+        is_favorite = data['isFavorite']
+        
+        with connection.cursor() as cursor:
+            if is_favorite:
+                cursor.execute("SELECT MAX(favoriteID) FROM Favorites")
+                newfavID = cursor.fetchone()[0]
+                cursor.execute(
+                    "INSERT INTO Favorites (favoriteID, userID, restaurantName, note) VALUES (%s, %s, %s, %s)", 
+                    [newfavID +1, user.userID, restaurant_name, 'haha']  # Ensure these fields match your model
+                )
+            else:
+                cursor.execute(
+                    "DELETE FROM Favorites WHERE userID = %s AND restaurantName = %s", 
+                    [user, restaurant_name]
+                )
+
+        # if not is_favorite:
+        #     with connection.cursor() as cursor:
+        #         cursor.execute("SELECT COUNT(*) FROM Favorites")
+        #         newfavID = cursor.fetchone()[0]
+        #         cursor.execute("INSERT INTO Favorites (favoriteID, userID, restaurantName, note) VALUES (%s, %s, %s, %s)", [newfavID, user, restaurant_name, 'haha'])
+        # else:
+        #     with connection.cursor() as cursor:
+        #         cursor.execute("DELETE FROM Favorites WHERE userID = %s AND restaurantName = %s", [user, restaurant_name])
+
+                # cursor.execute('''
+                # DELIMITER //
+                # CREATE TRIGGER trig
+                #     AFTER DELETE ON Favorites
+                #     FOR EACH ROW
+                #     BEGIN
+                #         SET @hist = (
+                #         SELECT historyID 
+                #         FROM History
+                #         WHERE input = old.restaurantName
+                #         );
+                        
+                #         IF @hist IS NULL THEN
+                #             DELETE FROM History WHERE historyID = @hist;
+                #         END IF;
+                #     END //
+                # DELIMITER ;
+                # ''')
+        return JsonResponse({'status': 'success'})
+
+
+def call_my_stored_procedure():
+    # Create a cursor
+    with connection.cursor() as cursor:
+        # Call the stored procedure passing in two parameters
+        cursor.callproc('Result')
+
+        # Fetch the results
+        results = cursor.fetchall()
+
+    return results
+
+results = call_my_stored_procedure()
+print(results)
