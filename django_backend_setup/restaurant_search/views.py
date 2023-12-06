@@ -3,7 +3,7 @@ from django.db import connection
 from .models import Restaurant, Rating, Users, History, Favorites
 from .forms import RestaurantFilterForm
 from rest_framework import viewsets
-from .serializers import RestaurantSerializer, RatingSerializer
+from .serializers import RestaurantSerializer, RatingSerializer, FavoritesSerializer, HistorySerializer
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -66,8 +66,22 @@ class RestaurantViewSet(viewsets.ModelViewSet):
 
 class RatingList(APIView):
     def get(self, request, restaurant_name):
-        ratings = Rating.objects.filter(restaurantName=restaurant_name)
+        ratings = Rating.objects.raw('SELECT * FROM Rating WHERE restaurantName = %s', [restaurant_name])
         serializer = RatingSerializer(ratings, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class UserFavoritesView(APIView):
+    def get(self, request, user_name):
+        user = Users.objects.raw('SELECT userID FROM Users WHERE userName = user_name')
+        favorites = Favorites.objects.raw('SELECT * FROM Favorites WHERE userID = %s', [user])
+        serializer = FavoritesSerializer(favorites, many=True)
+        return Response(serializer.data)
+
+class UserHistoryView(APIView):
+    def get(self, request, user_name):
+        user = Users.objects.raw('SELECT userID FROM Users WHERE userName = user_name')
+        history = History.objects.raw('SELECT * FROM History WHERE userID = %s', [user])
+        serializer = HistorySerializer(history, many=True)
+        return Response(serializer.data)
 
     

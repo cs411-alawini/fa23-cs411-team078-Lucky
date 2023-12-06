@@ -18,7 +18,7 @@ class UsersSerializer(serializers.ModelSerializer):
 
 class FavoritesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Restaurant
+        model = Favorites
         fields = '__all__'  # Or list the fields you want to include
 
 class HistorySerializer(serializers.ModelSerializer):
