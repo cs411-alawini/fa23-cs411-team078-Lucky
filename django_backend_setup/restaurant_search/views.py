@@ -18,27 +18,7 @@ from django.http import JsonResponse
 import json
 
 def restaurant_list(request):
-    # form = RestaurantFilterForm(request.GET)
-    
-    
-    # if form.is_valid():
-    #     style = form.cleaned_data.get('style')
-    #     price = form.cleaned_data.get('price')
-    #     zip = form.cleaned_data.get('zip')
-
-    #     restaurants = Restaurant.objects.all()
-    #     if style:
-    #         restaurants = restaurants.filter(style=style)
-    #     if price:
-    #         restaurants = restaurants.filter(price=price)
-    #     if zip:
-    #         restaurants = restaurants.filter(zip=zip)
-    
-    # else:
-    # restaurants = Restaurant.objects.all()
     restaurants = Restaurant.objects.raw('SELECT * FROM Restaurants')
-            
-    # return render(request, 'restaurant_list.html', {'restaurants': restaurants})
     return render(request, 'restaurant_list.html', {'restaurants': restaurants})
 
 def restaurant_detail(request, restaurant_name):
@@ -82,40 +62,19 @@ class RatingList(APIView):
 
 class UserFavoritesView(APIView):
     def get(self, request, user_name):
-        # user = Users.objects.raw('SELECT userID FROM Users WHERE userID = %d',  [user_name])
-        user = Users.objects.filter(userName=user_name)[0]
-        # favorites = Favorites.objects.raw('SELECT * FROM Favorites WHERE userID = %d', [user_name])
-        favorites = Favorites.objects.filter(userID = user)
+        user = Users.objects.raw('SELECT userID FROM Users WHERE userName = %s', [user_name])[0]
+        # user = Users.objects.filter(userName=user_name)[0]
+        favorites = Favorites.objects.raw('SELECT * FROM Favorites WHERE userID = %s', [user.userID])
+        # favorites = Favorites.objects.filter(userID = user.userID)
         serializer = FavoritesSerializer(favorites, many=True)
         return Response(serializer.data)
-    # def post(self, request, user_name):
-    #     # Get the user object using ORM to ensure it exists
-    #     user = get_object_or_404(Users, userName=user_name)
-    #     data = request.data
-    #     restaurant_name = data['restaurantName']
-    #     is_favorite = data['isFavorite']
-
-    #     # Use raw SQL to update the favorite
-    #     with connection.cursor() as cursor:
-    #         if is_favorite:
-    #             # Here you would insert the favorite, ensuring you use parameterized queries
-    #             cursor.execute("SELECT COUNT(*) FROM Favorites")
-    #             newfavID = cursor.fetchone()[0]
-    #             cursor.execute("INSERT INTO Favorites (favoriteID, userID, restaurantName, note) VALUES (%s, %s, %s, %s)", [newfavID, user, restaurant_name, 'haha'])
-    #             status_code = status.HTTP_201_CREATED
-    #         else:
-    #             cursor.execute("DELETE FROM Favorites WHERE userID = %s AND restaurantName = %s", [user, restaurant_name])
-
-    #             status_code = status.HTTP_204_NO_CONTENT
-
-    #     return Response({'status': 'success'}, status=status_code)
 
 class UserHistoryView(APIView):
     def get(self, request, user_name):
         # user_query = Users.objects.raw('SELECT userID FROM Users WHERE userName = user_name')
-        user = Users.objects.filter(userName=user_name)[0]
+        user = Users.objects.raw('SELECT userID FROM Users WHERE userName = %s', [user_name])[0]
         # history = History.objects.raw('SELECT * FROM History WHERE userID = %d', [user])
-        history = History.objects.filter(userID = user)
+        history = History.objects.raw('SELECT * FROM History WHERE userID = %s', [user.userID])
         serializer = HistorySerializer(history, many=True)
         return Response(serializer.data)
 
@@ -134,7 +93,7 @@ class UserHistoryView(APIView):
 @csrf_exempt
 def update_favorite(request, user_name):
     if request.method == 'POST':
-        user = Users.objects.filter(userName=user_name)[0]
+        user = Users.objects.raw('SELECT userID FROM Users WHERE userName = %s', [user_name])[0]
         data = json.loads(request.body)
         restaurant_name = data['restaurantName']
         
@@ -184,16 +143,22 @@ def update_favorite(request, user_name):
         return JsonResponse({'status': 'success'})
 
 
-def call_my_stored_procedure():
-    # Create a cursor
-    with connection.cursor() as cursor:
-        # Call the stored procedure passing in two parameters
-        cursor.callproc('Result')
+class UserRecommandView(APIView):
+    def get(self, request, user_name):
+        # user_query = Users.objects.raw('SELECT userID FROM Users WHERE userName = user_name')
+        user = Users.objects.raw('SELECT userID FROM Users WHERE userName = %s', [user_name])[0]
+        restaurant_name = 'haha'
+        # history = History.objects.raw('SELECT * FROM History WHERE userID = %d', [user])
+        with connection.cursor() as cursor:
+            # Call the stored procedure passing in two parameters
+            cursor.callproc('Result')
 
-        # Fetch the results
-        results = cursor.fetchall()
+            # Fetch the results
+            records = cursor.fetchall()
+            for row in records:
+                if row[0] == user.userID:
+                    restaurant_name = row[1]
 
-    return results
-
-results = call_my_stored_procedure()
-print(results)
+            restaurant_info = Restaurant.objects.raw('SELECT * FROM Restaurants WHERE restaurantName = %s', [restaurant_name])
+            serializer = RestaurantSerializer(restaurant_info, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
