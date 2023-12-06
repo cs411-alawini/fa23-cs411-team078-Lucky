@@ -16,7 +16,13 @@ function Favorite() {
         const fetchFavorite = async () => {
         try {
             const response = await axios.get(`http://localhost:8000/api/user/favorites/${username}/`);
-            setFavorite(response.data);
+             // Filter favorites based on the isFavorite status in local storage
+             const filteredFavorites = response.data.filter(item => 
+                localStorage.getItem(`isFavorite_${item.restaurantName}`) === 'true'
+            );
+           
+            // setFavorite(response.data);
+            setFavorite(filteredFavorites);
         } catch (error) {
             console.error("Error fetching data: ", error);
         }
@@ -24,6 +30,8 @@ function Favorite() {
 
         fetchFavorite();
     }, [username]);
+
+    
     
     return (
         <div className="favorite-page"> {/* Use the class name as defined in your CSS */}

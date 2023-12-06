@@ -1,57 +1,70 @@
-import { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { UserContext } from './UserContext';
-
 import "./RestaurantDetailPage.css";
 
-// pass in list of restaurants
 function RestaurantDetailPage() {
   const [isFavorite, setIsFavorite] = useState(false);
   const navigate = useNavigate();
-
   const { user } = useContext(UserContext);
-  const username = user?.username || localStorage.getItem('username'); // Fallback to local storage
-  console.log(username);
-
-  // const { id } = useParams();
+  const username = user?.username || localStorage.getItem('username');
   const { state: restaurant } = useLocation();
 
   const handleBack = () => {
-    // Navigate back to the restaurant list page
     navigate(-1);
   };
 
-  function toggleFavorite() {
-    // setIsFavorite((isFavorite) => !isFavorite);
-    console.log(`isFacorite: ${isFavorite}`);
-    console.log(restaurant.restaurantName);
-
-    setIsFavorite(prevIsFavorite => {
-      const newIsFavorite = !prevIsFavorite;
-  
-      // Send POST request to Django backend
-      axios.post(`http://localhost:8000/api/update/${username}/`, {
-        restaurantName: restaurant.restaurantName,
-        isFavorite: newIsFavorite
-      })
-      .then(response => {
-        console.log(restaurant.restaurantName);
-        console.log(response.data);
-      })
-      .catch(error => {
-        console.error('Error updating favorite: ', error);
-      });
-  
-      return newIsFavorite;
+  function addFavorite() {
+    axios.post(`http://localhost:8000/api/add/${username}/`, {
+      restaurantName: restaurant.restaurantName
+    })
+    .then(response => {
+      setIsFavorite(true);
+      localStorage.setItem(`isFavorite_${restaurant.restaurantName}`, true);
+      console.log(response.data);
+    })
+    .catch(error => {
+      console.error('Error adding to favorite: ', error);
     });
+  }
+
+  function removeFavorite() {
+    axios.delete(`http://localhost:8000/api/delete/${username}/`, {
+      data: { restaurantName: restaurant.restaurantName }
+    })
+    .then(response => {
+      setIsFavorite(false);
+      localStorage.setItem(`isFavorite_${restaurant.restaurantName}`, false);
+      console.log(response.data);
+    })
+    .catch(error => {
+      console.error('Error removing from favorite: ', error);
+    });
+    localStorage.setItem(`isFavorite_${restaurant.restaurantName}`, false);
+    console.log('unfavorite',isFavorite)
+  }
+
+  function toggleFavorite() {
+    if (isFavorite) {
+      removeFavorite();
+    } else {
+      addFavorite();
+    }
   }
 
   const [ratings, setRatings] = useState([]);
   const [allrate, setAllRate] = useState([]);
   const encodedRestaurantName = encodeURIComponent(restaurant.restaurantName);
+
   useEffect(() => {
-    // Fetch restaurants from the Django backend
+    const favoriteStatus = localStorage.getItem(`isFavorite_${restaurant.restaurantName}`);
+    console.log('useeffect: ',favoriteStatus)
+    setIsFavorite(favoriteStatus === 'true');
+    // setIsFavorite(favoriteStatus);
+  }, [restaurant]);
+
+  useEffect(() => {
     const fetchRatings = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/api/ratings/${encodedRestaurantName}/`);
@@ -61,31 +74,16 @@ function RestaurantDetailPage() {
         console.error("Error fetching data: ", error);
       }
     };
+    
 
     fetchRatings();
   }, [encodedRestaurantName]);
 
-  // useEffect(() => {
-  // // Define a function to fetch ratings and favorite status
-  // const fetchData = async () => {
-  //   try {
-  //     // Fetch ratings
-  //     const ratingsResponse = await axios.get(`http://localhost:8000/api/ratings/${encodedRestaurantName}/`);
-  //     setRatings(ratingsResponse.data[0].score);
-  //     setAllRate(ratingsResponse.data);
-
-  //     // Fetch favorite status
-  //     const favoriteResponse = await axios.get(`http://localhost:8000/api/user/favorites/${username}/${encodedRestaurantName}/`);
-  //     setIsFavorite(favoriteResponse.data.isFavorite); // Adjust this line based on how your backend sends the favorite status
-  //   } catch (error) {
-  //     console.error("Error fetching data: ", error);
-  //   }
-  // };
-
-  // Call the function
-//   fetchData();
-// }, [username, encodedRestaurantName]);
-
+  // You can include another useEffect here to fetch the favorite status when the component mounts
+  // This is left as a placeholder since the exact implementation depends on your backend API
+  useEffect(() => {
+    // Fetch the initial favorite status...
+  }, [username, restaurant]);
 
   return (
     <div className="restaurantDetailPage">
@@ -110,7 +108,6 @@ function RestaurantDetailPage() {
           </div>
           <div>
             <label>Price:</label>
-            {/* replace restaurant.price with price */}
             <span>{restaurant.price}</span>
           </div>
           <div>
@@ -134,4 +131,3 @@ function RestaurantDetailPage() {
 }
 
 export default RestaurantDetailPage;
-
