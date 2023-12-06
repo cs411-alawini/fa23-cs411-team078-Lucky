@@ -1,8 +1,9 @@
 // RestaurantListPage.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./RestaurantListPage.css"; // Make sure to create a corresponding CSS file
 import { useNavigate } from "react-router-dom";
 import RestaurantItem from "../Components/RestaurantItem";
+import axios from "axios";
 
 function RestaurantListPage() {
   // 这里做对接
@@ -37,9 +38,23 @@ function RestaurantListPage() {
     // ... more restaurants
   ];
 
-  const [recommends, setRecommends] = useState(dummyRestaurants); // This should be your actual restaurant data
+  const [recommends, setRecommends] = useState([]); // This should be your actual restaurant data
   const [searchTerm, setSearchTerm] = useState("");
   const [currentTag, setCurrentTag] = useState("recommend");
+
+  useEffect(() => {
+    // Fetch restaurants from the Django backend
+    const fetchRestaurants = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/Restaurant/');
+        setRecommends(response.data);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      }
+    };
+
+    fetchRestaurants();
+  }, []);
 
   // 这俩做对接
   const [histories, setHistories] = useState([]);
@@ -54,7 +69,7 @@ function RestaurantListPage() {
   function filterRestaurants(restaurants) {
     return restaurants.filter(
       (restaurant) =>
-        restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        restaurant.restaurantName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         restaurant.address.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }
@@ -105,7 +120,7 @@ function RestaurantListPage() {
       <div className="restaurant-list">
         {currentTag === "recommend" &&
           filterRestaurants(restaurants).map((restaurant) => (
-            <RestaurantItem restaurant={restaurant} key={restaurant.id} />
+            <RestaurantItem restaurant={restaurant} key={restaurant.restaurantName} />
           ))}
       </div>
     </div>
