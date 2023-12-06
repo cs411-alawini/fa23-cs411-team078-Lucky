@@ -6,49 +6,16 @@ import RestaurantItem from "../Components/RestaurantItem";
 import axios from "axios";
 
 function RestaurantListPage() {
-  // 这里做对接
-  // const dummyRestaurants = [
-  //   {
-  //     id: 1,
-  //     name: "The Gourmet Hut",
-  //     rating: "4.5",
-  //     style: "Italian",
-  //     price: "$$$",
-  //     address: "123 Foodie Lane, Taste Town",
-  //     comments: ["The", "Gourmet", "Hut"],
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "Burger Bonanza",
-  //     rating: "4.2",
-  //     style: "Fast Food",
-  //     price: "$",
-  //     address: "456 Snack Street, Munch City",
-  //     comments: ["Burger", "Bonanza"],
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "Sushi Central",
-  //     rating: "4.8",
-  //     style: "Japanese",
-  //     price: "$$$",
-  //     address: "789 Sashimi Blvd, Oceanview",
-  //     comments: ["Sushi", "Central"],
-  //   },
-  //   // ... more restaurants
-  // ];
-
   const [recommends, setRecommends] = useState([]); // This should be your actual restaurant data
   const [searchTerm, setSearchTerm] = useState("");
   const [currentTag, setCurrentTag] = useState("recommend");
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Fetch restaurants from the Django backend
     const fetchRestaurants = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8000/api/Restaurant/"
-        );
+        const response = await axios.get('http://localhost:8000/api/Restaurant/');
         setRecommends(response.data);
       } catch (error) {
         console.error("Error fetching data: ", error);
@@ -90,7 +57,6 @@ function RestaurantListPage() {
 
   return (
     <div className="restaurant-list-page">
-      <h1>Welcome, Dawn</h1>
       {/* Tabs and Search Bar */}
       <div className="top-bar">
         <div className="tabs">
@@ -108,7 +74,7 @@ function RestaurantListPage() {
           </button>
           <button
             className={currentTag === "favorite" ? "active" : ""}
-            onClick={() => setCurrentTag("favorite")}
+            onClick={() => navigate('/favorite')}
           >
             Favorite
           </button>
@@ -116,8 +82,11 @@ function RestaurantListPage() {
         <input
           type="text"
           placeholder="Search..."
-          // value={searchTerm}
-          // onChange={handleSearch}
+          onChange={(e) => {
+            if (!e.target.value) {
+              setSearchTerm(e.target.value);
+            }
+          }}
           onKeyUp={handleSearch}
         />
       </div>
@@ -125,10 +94,7 @@ function RestaurantListPage() {
       <div className="restaurant-list">
         {currentTag === "recommend" &&
           filterRestaurants(restaurants).map((restaurant) => (
-            <RestaurantItem
-              restaurant={restaurant}
-              key={restaurant.restaurantName}
-            />
+            <RestaurantItem restaurant={restaurant} key={restaurant.restaurantName} />
           ))}
       </div>
     </div>
@@ -136,3 +102,4 @@ function RestaurantListPage() {
 }
 
 export default RestaurantListPage;
+

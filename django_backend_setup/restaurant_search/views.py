@@ -1,13 +1,17 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db import connection
 from .models import Restaurant, Rating, Users, History, Favorites
-from .forms import RestaurantFilterForm
+# from .forms import RestaurantFilterForm
 from rest_framework import viewsets
 from .serializers import RestaurantSerializer, RatingSerializer, FavoritesSerializer, HistorySerializer
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 
 def restaurant_list(request):
     # form = RestaurantFilterForm(request.GET)
@@ -49,9 +53,11 @@ def restaurant_ratings(request, restaurant_name):
 
 def show_data(request):
     users = Users.objects.all()  # Retrieves all users
+    # users = Users.objects.raw("SELECT * FROM Users WHERE userName LIKE '7de8a958'")
     history = History.objects.all()  # Retrieves all history records
     favorites = Favorites.objects.all()  # Retrieves all favorites records
 
+    
     context = {
         'users': users,
         'history': history,
@@ -61,16 +67,8 @@ def show_data(request):
     return render(request, 'shows.html', context)
 
 class RestaurantViewSet(viewsets.ModelViewSet):
-    def get(self, request):
-        input = request.data.get('input', None)
-        if input is None:
-            restaurants = Restaurant.objects.raw('SELECT * FROM Restaurants')
-        else:
-            restaurants = Restaurant.objects.raw('SELECT * FROM Restaurants WHERE restaurantName = input')
-        serializer = RestaurantSerializer(restaurants, many=True)
-        if serializer.is_valid():
-            serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    queryset = Restaurant.objects.raw('SELECT * FROM Restaurants')
+    serializer_class = RestaurantSerializer
 
 class RatingList(APIView):
     def get(self, request, restaurant_name):
@@ -80,16 +78,30 @@ class RatingList(APIView):
 
 class UserFavoritesView(APIView):
     def get(self, request, user_name):
-        user = Users.objects.raw('SELECT userID FROM Users WHERE userName = user_name')
-        favorites = Favorites.objects.raw('SELECT * FROM Favorites WHERE userID = %s', [user])
+        # user = Users.objects.raw('SELECT userID FROM Users WHERE userName = %s', [user_name])
+        user = Users.objects.filter(userName=user_name)[0]
+        # favorites = Favorites.objects.raw('SELECT * FROM Favorites WHERE userID = %s', [user])
+        favorites = Favorites.objects.filter(userID = user)
         serializer = FavoritesSerializer(favorites, many=True)
         return Response(serializer.data)
 
 class UserHistoryView(APIView):
     def get(self, request, user_name):
         user = Users.objects.raw('SELECT userID FROM Users WHERE userName = user_name')
-        history = History.objects.raw('SELECT * FROM History WHERE userID = %s', [user])
+        history = History.objects.raw('SELECT * FROM History WHERE userID = %d', [user])
         serializer = HistorySerializer(history, many=True)
         return Response(serializer.data)
+
+# def add_favorite(request, restaurantName):
+#     user_id = request.user.id  # assuming the user is authenticated
+#     with connection.cursor() as cursor:
+#         cursor.execute("INSERT INTO favorite (user_id, restaurant_id) VALUES (%s, %s)", [user_id, restaurantName])
+#     return JsonResponse({'status': 'success'})
+
+# def delete_favorite(request, restaurantName):
+#     user_id = request.user.id
+#     with connection.cursor() as cursor:
+#         cursor.execute("DELETE FROM favorite WHERE user_id = %s AND restaurant_id = %s", [user_id, restaurantName])
+#     return JsonResponse({'status': 'success'})
 
     
