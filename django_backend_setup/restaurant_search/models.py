@@ -1,6 +1,5 @@
 from django.db import models
 
-
 class Restaurant(models.Model):
     restaurantName = models.CharField(max_length=255, primary_key=True)
     style = models.CharField(max_length=255, null=False)
