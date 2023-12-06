@@ -17,8 +17,6 @@ function Favorite() {
         try {
             const response = await axios.get(`http://localhost:8000/api/user/favorites/${username}/`);
             setFavorite(response.data);
-            console.log(response.data);
-            console.log(username);
         } catch (error) {
             console.error("Error fetching data: ", error);
         }

@@ -68,7 +68,7 @@ function RestaurantListPage() {
           </button>
           <button
             className={currentTag === "history" ? "active" : ""}
-            onClick={() => setCurrentTag("history")}
+            onClick={() => navigate('/history')}
           >
             History
           </button>
