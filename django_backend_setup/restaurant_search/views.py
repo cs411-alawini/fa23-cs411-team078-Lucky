@@ -61,8 +61,16 @@ def show_data(request):
     return render(request, 'shows.html', context)
 
 class RestaurantViewSet(viewsets.ModelViewSet):
-    queryset = Restaurant.objects.raw('SELECT * FROM Restaurants')
-    serializer_class = RestaurantSerializer
+    def get(self, request):
+        input = request.data.get('input', None)
+        if input is None:
+            restaurants = Restaurant.objects.raw('SELECT * FROM Restaurants')
+        else:
+            restaurants = Restaurant.objects.raw('SELECT * FROM Restaurants WHERE restaurantName = input')
+        serializer = RestaurantSerializer(restaurants, many=True)
+        if serializer.is_valid():
+            serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class RatingList(APIView):
     def get(self, request, restaurant_name):
