@@ -23,6 +23,7 @@ function RestaurantDetailPage() {
   }
 
   const [ratings, setRatings] = useState([]);
+  const [allrate, setAllRate] = useState([]);
   const encodedRestaurantName = encodeURIComponent(restaurant.restaurantName);
   useEffect(() => {
     // Fetch restaurants from the Django backend
@@ -30,7 +31,7 @@ function RestaurantDetailPage() {
       try {
         const response = await axios.get(`http://localhost:8000/api/ratings/${encodedRestaurantName}/`);
         setRatings(response.data[0].score);
-        console.log(response.data[0].score);
+        setAllRate(response.data);
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
@@ -70,11 +71,13 @@ function RestaurantDetailPage() {
             <span>{restaurant.address}</span>
           </div>
         </div>
-        {/* <div className="restaurantComments">
-          {restaurant.comments.map((comment) => {
-            return <p key={comment}>{comment}</p>;
-          })}
-        </div> */}
+        <div className="restaurantComments">
+          {allrate.map((rating) => (
+            <div key={rating.ratingID}>
+              <p><strong>Comment:</strong> {rating.comment}</p>
+            </div>
+          ))}
+        </div>
         <button className="backButton" onClick={handleBack}>
           Back
         </button>
